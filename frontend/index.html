@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>KarmaSkill AI</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Main stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+         APPLICATION
+    ====================================================== -->
+
+    <div id="app">
+
+        <!-- =================================================
+             SIDEBAR
+        ================================================== -->
+
+        <aside class="sidebar" id="sidebar">
+
+            <!-- Brand -->
+            <div class="brand">
+
+                <div class="brand-logo">
+                    K
+                </div>
+
+                <div class="brand-text">
+
+                    <div class="brand-name">
+                        KarmaSkill <span>AI</span>
+                    </div>
+
+                    <div class="brand-tagline">
+                        Learn. Grow. Serve Better.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Main Navigation -->
+            <nav class="sidebar-navigation">
+
+                <button
+                    class="nav-item active"
+                    data-page="dashboard"
+                    type="button"
+                >
+                    <span class="nav-icon">▦</span>
+                    <span class="nav-label">Dashboard</span>
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="assessments"
+                    type="button"
+                >
+                    <span class="nav-icon">▣</span>
+                    <span class="nav-label">Assessments</span>
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="learning"
+                    type="button"
+                >
+                    <span class="nav-icon">▢</span>
+                    <span class="nav-label">Learning</span>
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="progress"
+                    type="button"
+                >
+                    <span class="nav-icon">↗</span>
+                    <span class="nav-label">Progress</span>
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="recommendations"
+                    type="button"
+                >
+                    <span class="nav-icon">♧</span>
+                    <span class="nav-label">Recommendations</span>
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="profile"
+                    type="button"
+                >
+                    <span class="nav-icon">♙</span>
+                    <span class="nav-label">Profile</span>
+                </button>
+
+            </nav>
+
+
+            <!-- Sidebar Bottom -->
+            <div class="sidebar-bottom">
+
+                <button
+                    class="nav-item"
+                    data-page="settings"
+                    type="button"
+                >
+                    <span class="nav-icon">⚙</span>
+                    <span class="nav-label">Settings</span>
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-action="logout"
+                    type="button"
+                >
+                    <span class="nav-icon">↪</span>
+                    <span class="nav-label">Logout</span>
+                </button>
+
+
+                <div class="india-message">
+
+                    <span class="india-flag">
+                        🇮🇳
+                    </span>
+
+                    <span>
+                        A Smarter, Skilled India
+                    </span>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+
+        <!-- =================================================
+             MAIN APPLICATION AREA
+        ================================================== -->
+
+        <div class="main-wrapper">
+
+
+            <!-- =================================================
+                 TOP HEADER
+            ================================================== -->
+
+            <header class="topbar">
+
+                <!-- Mobile menu -->
+                <button
+                    id="mobile-menu-button"
+                    class="mobile-menu-button"
+                    type="button"
+                    aria-label="Open navigation"
+                >
+                    ☰
+                </button>
+
+
+                <!-- Search -->
+                <div class="search-container">
+
+                    <span class="search-icon">
+                        ⌕
+                    </span>
+
+                    <input
+                        type="text"
+                        id="global-search"
+                        class="global-search"
+                        placeholder="Search for skills, courses, assessments..."
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <!-- Header Right -->
+                <div class="header-actions">
+
+
+                    <!-- Notifications -->
+                    <button
+                        class="notification-button"
+                        type="button"
+                        aria-label="Notifications"
+                    >
+
+                        <span class="notification-icon">
+                            ♧
+                        </span>
+
+                        <span class="notification-dot"></span>
+
+                    </button>
+
+
+
+                    <!-- Demo Account Selector -->
+                    <div class="account-selector-wrapper">
+
+                        <select
+                            id="accountSelector"
+                            class="account-selector"
+                            aria-label="Switch demo account"
+                        >
+
+                            <option value="employee">
+                                Rahul Sharma
+                            </option>
+
+                            <option value="admin">
+                                KarmaSkill Admin
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- User Information -->
+                    <div class="header-user">
+
+                        <div
+                            class="header-avatar"
+                            id="header-avatar"
+                        >
+                            RS
+                        </div>
+
+                        <div class="header-user-details">
+
+                            <div
+                                class="header-user-name"
+                                id="header-user-name"
+                            >
+                                Rahul Sharma
+                            </div>
+
+                            <div
+                                class="header-user-role"
+                                id="header-user-role"
+                            >
+                                Statistical Officer
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+
+
+            <!-- =================================================
+                 PAGE CONTENT
+            ================================================== -->
+
+            <main class="main-content" id="appContent">
+
+                <!-- JavaScript will render pages here -->
+
+                <section class="initial-loading">
+
+                    <div class="loading-spinner"></div>
+
+                    <p>
+                        Loading KarmaSkill AI...
+                    </p>
+
+                </section>
+
+            </main>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         MODAL CONTAINER
+    ====================================================== -->
+
+    <div id="appModal" class="modal-backdrop hidden" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Details</h3>
+                <button type="button" class="modal-close" id="modalCloseButton" aria-label="Close">×</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+
+
+    <!-- =====================================================
+         TOAST NOTIFICATION CONTAINER
+    ====================================================== -->
+
+    <div
+        id="toast-container"
+        class="toast-container"
+        aria-live="polite"
+    ></div>
+
+
+
+    <!-- =====================================================
+         APPLICATION JAVASCRIPT
+    ====================================================== -->
+
+    <script src="js/state.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/assessments.js"></script>
+    <script src="js/learning.js"></script>
+    <script src="js/progress.js"></script>
+    <script src="js/recommendations.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,435 @@
+[1mdiff --git a/.env.example b/.env.example[m
+[1mnew file mode 100644[m
+[1mindex 0000000..73be7b5[m
+[1m--- /dev/null[m
+[1m+++ b/.env.example[m
+[36m@@ -0,0 +1 @@[m
+[32m+[m[32mGEMINI_API_KEY=your_gemini_api_key_here[m
+\ No newline at end of file[m
+[1mdiff --git a/.gitignore b/.gitignore[m
+[1mnew file mode 100644[m
+[1mindex 0000000..664712f[m
+[1m--- /dev/null[m
+[1m+++ b/.gitignore[m
+[36m@@ -0,0 +1,5 @@[m
+[32m+[m[32m.env[m
+[32m+[m[32m.venv/[m
+[32m+[m[32m__pycache__/[m
+[32m+[m[32m*.pyc[m
+[32m+[m[32mkarmaskill.db[m
+\ No newline at end of file[m
+[1mdiff --git a/database.py b/database.py[m
+[1mnew file mode 100644[m
+[1mindex 0000000..2f9e7e3[m
+[1m--- /dev/null[m
+[1m+++ b/database.py[m
+[36m@@ -0,0 +1,27 @@[m
+[32m+[m[32mfrom sqlalchemy import create_engine[m
+[32m+[m[32mfrom sqlalchemy.orm import declarative_base, sessionmaker[m
+[32m+[m
+[32m+[m[32mDATABASE_URL = "sqlite:///./karmaskill.db"[m
+[32m+[m
+[32m+[m[32mengine = create_engine([m
+[32m+[m[32m    DATABASE_URL,[m
+[32m+[m[32m    connect_args={"check_same_thread": False}[m
+[32m+[m[32m)[m
+[32m+[m
+[32m+[m[32mSessionLocal = sessionmaker([m
+[32m+[m[32m    autocommit=False,[m
+[32m+[m[32m    autoflush=False,[m
+[32m+[m[32m    bind=engine,[m
+[32m+[m[32m    expire_on_commit=False[m
+[32m+[m[32m)[m
+[32m+[m
+[32m+[m[32mBase = declarative_base()[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef get_db():[m
+[32m+[m[32m    db = SessionLocal()[m
+[32m+[m
+[32m+[m[32m    try:[m
+[32m+[m[32m        yield db[m
+[32m+[m[32m    finally:[m
+[32m+[m[32m        db.close()[m
+\ No newline at end of file[m
+[1mdiff --git a/main.py b/main.py[m
+[1mnew file mode 100644[m
+[1mindex 0000000..5bb0693[m
+[1m--- /dev/null[m
+[1m+++ b/main.py[m
+[36m@@ -0,0 +1,49 @@[m
+[32m+[m[32mfrom fastapi import FastAPI[m
+[32m+[m
+[32m+[m[32mfrom database import Base, engine[m
+[32m+[m
+[32m+[m[32mfrom routers import employees[m
+[32m+[m[32mfrom routers import competencies[m
+[32m+[m[32mfrom routers import assessments[m
+[32m+[m[32mfrom routers import roles[m
+[32m+[m[32mfrom routers import recommendations[m
+[32m+[m[32mfrom routers import materials[m
+[32m+[m[32mfrom routers import quizzes[m
+[32m+[m
+[32m+[m[32mBase.metadata.create_all(bind=engine)[m
+[32m+[m
+[32m+[m
+[32m+[m[32mapp = FastAPI([m
+[32m+[m[32m    title="KarmaSkill AI",[m
+[32m+[m[32m    description=([m
+[32m+[m[32m        "AI-powered Competency Gap and "[m
+[32m+[m[32m        "Personalized Learning Engine"[m
+[32m+[m[32m    ),[m
+[32m+[m[32m    version="0.1.0"[m
+[32m+[m[32m)[m
+[32m+[m
+[32m+[m
+[32m+[m[32mapp.include_router(employees.router)[m
+[32m+[m[32mapp.include_router(competencies.router)[m
+[32m+[m[32mapp.include_router(assessments.router)[m
+[32m+[m[32mapp.include_router(roles.router)[m
+[32m+[m[32mapp.include_router(recommendations.router)[m
+[32m+[m[32mapp.include_router(materials.router)[m
+[32m+[m[32mapp.include_router(quizzes.router)[m
+[32m+[m
+[32m+[m[32m@app.get("/")[m
+[32m+[m[32mdef root():[m
+[32m+[m
+[32m+[m[32m    return {[m
+[32m+[m[32m        "project": "KarmaSkill AI",[m
+[32m+[m[32m        "message": "Competency Gap Engine API",[m
+[32m+[m[32m        "status": "running"[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m
+[32m+[m[32m@app.get("/health")[m
+[32m+[m[32mdef health():[m
+[32m+[m
+[32m+[m[32m    return {[m
+[32m+[m[32m        "status": "healthy"[m
+[32m+[m[32m    }[m
+\ No newline at end of file[m
+[1mdiff --git a/models.py b/models.py[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e548a6d[m
+[1m--- /dev/null[m
+[1m+++ b/models.py[m
+[36m@@ -0,0 +1,224 @@[m
+[32m+[m[32mfrom sqlalchemy import Column, Integer, String, Float, ForeignKey, Text[m
+[32m+[m[32mfrom sqlalchemy.orm import relationship[m
+[32m+[m
+[32m+[m[32mfrom database import Base[m
+[32m+[m
+[32m+[m
+[32m+[m[32mclass Employee(Base):[m
+[32m+[m[32m    __tablename__ = "employees"[m
+[32m+[m
+[32m+[m[32m    id = Column(Integer, primary_key=True, index=True)[m
+[32m+[m
+[32m+[m[32m    name = Column(String, nullable=False)[m
+[32m+[m[32m    email = Column(String, unique=True, nullable=False)[m
+[32m+[m[32m    department = Column(String, nullable=False)[m
+[32m+[m[32m    role = Column(String, nullable=False)[m
+[32m+[m[32m    experience = Column(Float, default=0)[m
+[32m+[m
+[32m+[m[32m    competencies = relationship([m
+[32m+[m[32m        "EmployeeCompetency",[m
+[32m+[m[32m        back_populates="employee",[m
+[32m+[m[32m        cascade="all, delete-orphan"[m
+[32m+[m[32m    )[m
+[32m+[m
+[32m+[m
+[32m+[m[32mclass Competency(Base):[m
+[32m+[m[32m    __tablename__ = "competencies"[m
+[32m+[m
+[32m+[m[32m    id = Column(Integer, primary_key=True, index=True)[m
+[32m+[m
+[32m+[m[32m    name = Column(String, unique=True, nullable=False)[m
+[32m+[m[32m    description = Column(Text)[m
+[32m+[m[32m    category = Column(String)[m
+[32m+[m
+[32m+[m[32m    employee_competencies = relationship([m
+[32m+[m[32m        "EmployeeCompetency",[m
+[32m+[m[32m        back_populates="competency"[m
+[32m+[m[32m    )[m
+[32m+[m
+[32m+[m
+[32m+[m[32mclass EmployeeCompetency(Base):[m
+[32m+[m[32m    __tablename__ = "employee_competencies"[m
+[32m+[m
+[32m+[m[32m    id = Column(Integer, primary_key=True, index=True)[m
+[32m+[m
+[32m+[m[32m    employee_id = Column([m
+[32m+[m[32m        Integer,[m
+[32m+[m[32m        ForeignKey("employees.id"),[m
+[32m+[m[32m        nullable=False[m
+[32m+[m[32m    )[m
+[32m+[m
+[32m+[m[32m    competency_id = Column([m
+[32m+[m[32m        Integer,[m
+[32m+[m[32m        ForeignKey("competencies.id"),[m
+[32m+[m[32m        nullable=False[m
+[32m+[m[32m    )[m
+[32m+[m
+[32m+[m[32m    current_level = Column(Float, default=0)[m
+[32m+[m[32m    required_level = Column(Float, default=0)[m
+[32m+[m
+[32m+[m[32m    employee = relationship([m
+[32m+[m[32m        "Employee",[m
+[32m+[m[32m        back_populates="competencies"[m
+[32m+[m[32m    )[m
+[32m+[m
+[32m+[m[32m    competency = relationship([m
+[32m+[m[32m        "Competency",[m
+[32m+[m[32m        back_populates="employee_competencies"[m
+[32m+[m[32m    )[m
+[32m+[m
+[32m+[m
+[32m+[m[32mclass Course(Base):[m
+[32m+[m[32m    __tablename__ = "courses"[m
+[32m+[m
+[32m+[m[32m    id = Column(Integer, primary_key=True, index=True)[m
+[32m+[m
+[32m+[m[32m    title = Column(String, nullable=False)[m
+[32m+[m[32m    description = Column(Text)[m
+[32m+[m[32m    difficulty = Column(String)[m
+[32m+[m[32m    duration = Column(Integer)[m
+[32m+[m
+[32m+[m[32m    content = Column(Text)[m
+[32m+[m
+[32m+[m
+[32m+[m[32mclass CourseCompetency(Base):[m
+[32m+[m[32m    __tablename__ = "course_competencies"[m
+[32m+[m
+[32m+[m[32m    id = Column(Integer, primary_key=True, index=True)[m
+[32m+[m
+[32m+[m[32m    course_id = Column([m
+[32m+[m[32m        Integer,[m
+[32m+[m[32m        ForeignKey("courses.id"),[m
+[32m+[m[32m        nullable=False[m
+[32m+[m[32m    )[m
+[32m+[m
+[32m+[m[32m    competency_id = Column([m
+[32m+[m[32m        Integer,[m
+[32m+[m[32m        ForeignKey("competencies.id"),[m
+[32m+[m[32m        nullable=False[m
+[32m+[m[32m    )[m
+[32m+[m
+[32m+[m[32m    coverage = Column(Float, default=0)[m
+[32m+[m
+[32m+[m[32mclass Assessment(Base):[m
+[32m+[m[32m    __tablename__ = "assessments"[m
+[32m+[m
+[32m+[m[32m    id = Column(Integer, primary_key=True, index=True)[m
+[32m+[m[32m    employee_id = Column(Integer, ForeignKey("employees.id"), nullable=False)[m
+[32m+[m[32m    competency_id = Column(Integer, ForeignKey("competencies.id"), nullable=False)[m
+[32m+[m
+[32m+[m[32m    score = Column(Float, nullable=False)[m
+[32m+[m[32m    total_questions = Column(Integer, nullable=False)[m
+[32m+[m[32m    percentage = Column(Float, nullable=False)[m
+[32m+[m
+[32m+[m[32m    employee = relationship("Employee")[m
+[32m+[m[32m    competency = relationship("Competency")[m
+[32m+[m
+[32m+[m[32mclass Role(Base):[m
+[32m+[m[32m    __tablename__ = "roles"[m
+[32m+[m
+[32m+[m[32m    id = Column(Integer, primary_key=True, index=True)[m
+[32m+[m[32m    name = Column(String, unique=True, nullable=False)[m
+[32m+[m[32m    description = Column(Text)[m
+[32m+[m
+[32m+[m
+[32m+[m[32mclass RoleCompetency(Base):[m
+[32m+[m[32m    __tablename__ = "role_competencies"[m
+[32m+[m
+[32m+[m[32m    id = Column(Integer, primary_key=True, index=True)[m
+[32m+[m[32m    role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)[m
+[32m+[m[32m    competency_id = Column(Integer, ForeignKey("competencies.id"), nullable=False)[m
+[32m+[m[32m    required_level = Column(Float, nullable=False)[m
+[32m+[m
+[32m+[m[32m    role = relationship("Role")[m
+[32m+[m[32m    competency = relationship("Competency")[m
+[32m+[m
+[32m+[m[32mclass LearningMaterial(Base):[m
+[32m+[m[32m    __tablename__ = "learning_materials"[m
+[32m+[m
+[32m+[m[32m    id = Column(Integer, primary_key=True, index=True)[m
+[32m+[m[32m    filename = Column(String, nullable=False)[m
+[32m+[m[32m    title = Column(String, nullable=False)[m
+[32m+[m[32m    extracted_text = Column(Text, nullable=False)[m
+[32m+[m[32m    pages = Column(Integer, default=0)[m
+[32m+[m
+[32m+[m
+[32m+[m[32mclass Quiz(Base):[m
+[32m+[m[32m    __tablename__ = "quizzes"[m
+[32m+[m
+[32m+[m[32m    id = Column(Integer, primary_key=True, index=True)[m
+[32m+[m[32m    material_id = Column([m
+[32m+[m[32m        Integer,[m
+[32m+[m[32m        ForeignKey("learning_materials.id"),[m
+[32m+[m[32m        nullable=False[m
+[32m+[m[32m    )[m
+[32m+[m[32m    title = Column(String, nullable=False)[m
+[32m+[m[32m    number_of_questions = Column(Integer, nullable=False)[m
+[32m+[m
+[32m+[m[32m    material = relationship("LearningMaterial")[m
+[32m+[m[32m    questions = relationship([m
+[32m+[m[32m        "QuizQuestion",[m
+[32m+[m[32m        back_populates="quiz",[m
+[32m+[m[32m        cascade="all, delete-orphan"[m
+[32m+[m[32m    )[m
+[32m+[m
+[32m+[m
+[32m+[m[32mclass QuizQuestion(Base):[m
+[32m+[m[32m    __tablename__ = "quiz_questions"[m
+[32m+[m
+[32m+[m[32m    id = Column(Integer, primary_key=True, index=True)[m
+[32m+[m[32m    quiz_id = Column([m
+[32m+[m[32m        Integer,[m
+[32m+[m[32m        ForeignKey("quizzes.id"),[m
+[32m+[m[32m        nullable=False[m
+[32m+[m[32m    )[m
+[32m+[m
+[32m+[m[32m    question = Column(Text, nullable=False)[m
+[32m+[m
+[32m+[m[32m    option_a = Column(Text, nullable=False)[m
+[32m+[m[32m    option_b = Column(Text, nullable=False)[m
+[32m+[m[32m    option_c = Column(Text, nullable=False)[m
+[32m+[m[32m    option_d = Column(Text, nullable=False)[m
+[32m+[m
+[32m+[m[32m    correct_answer = Column(String, nullable=False)[m
+[32m+[m[32m    explanation = Column(Text)[m
+[32m+[m[32m    difficulty = Column(String)[m
+[32m+[m
+[32m+[m[32m    # Competency associated with this question[m
+[32m+[m[32m    competency_id = Column([m
+[32m+[m[32m        Integer,[m
+[32m+[m[32m        ForeignKey("competencies.id"),[m
+[32m+[m[32m        nullable=True[m
+[32m+[m[32m    )[m
+[32m+[m
+[32m+[m[32m    quiz = relationship([m
+[32m+[m[32m        "Quiz",[m
+[32m+[m[32m        back_populates="questions"[m
+[32m+[m[32m    )[m
+[32m+[m
+[32m+[m[32m    competency = relationship("Competency")[m
+[32m+[m
+[32m+[m
+[32m+[m[32mclass QuizAttempt(Base):[m
+[32m+[m[32m    __tablename__ = "quiz_attempts"[m
+[32m+[m
+[32m+[m[32m    id = Column(Integer, primary_key=True, index=True)[m
+[32m+[m
+[32m+[m[32m    quiz_id = Column([m
+[32m+[m[32m        Integer,[m
+[32m+[m[32m        ForeignKey("quizzes.id"),[m
+[32m+[m[32m        nullable=False[m
+[32m+[m[32m    )[m
+[32m+[m
+[32m+[m[32m    employee_id = Column([m
+[32m+[m[32m        Integer,[m
+[32m+[m[32m        ForeignKey("employees.id"),[m
+[32m+[m[32m        nullable=False[m
+[32m+[m[32m    )[m
+[32m+[m
+[32m+[m[32m    score = Column(Float, nullable=False)[m
+[32m+[m[32m    total_questions = Column(Integer, nullable=False)[m
+[32m+[m[32m    percentage = Column(Float, nullable=False)[m
+[32m+[m
+[32m+[m[32m    quiz = relationship("Quiz")[m
+[32m+[m[32m    employee = relationship("Employee")[m
+\ No newline at end of file[m
+[1mdiff --git a/requirements.txt b/requirements.txt[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0ae1dfa[m
+[1m--- /dev/null[m
+[1m+++ b/requirements.txt[m
+[36m@@ -0,0 +1,7 @@[m
+[32m+[m[32mfastapi[m
+[32m+[m[32muvicorn[standard][m
+[32m+[m[32msqlalchemy[m
+[32m+[m[32mpydantic[m
+[32m+[m[32mpydantic[email][m
+[32m+[m[32mpython-multipart[m
+[32m+[m[32mpypdf[m
+\ No newline at end of file[m
+[1mdiff --git a/routers/__init__.py b/routers/__init__.py[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e69de29[m
+[1mdiff --git a/routers/assessments.py b/routers/assessments.py[m
+[1mnew file mode 100644[m
+[1mindex 0000000..2c1808b[m
+[1m--- /dev/null[m
+[1m+++ b/routers/assessments.py[m
+[36m@@ -0,0 +1,111 @@[m
+[32m+[m[32mfrom fastapi import APIRouter, Depends, HTTPException[m
+[32m+[m[32mfrom sqlalchemy.orm import Session[m
+[32m+[m[32mfrom services.assessment_engine import update_employee_competency[m
+[32m+[m
+[32m+[m[32mfrom database import get_db[m
+[32m+[m[32mfrom models import ([m
+[32m+[m[32m    Assessment,[m
+[32m+[m[32m    Employee,[m
+[32m+[m[32m    Competency,[m
+[32m+[m[32m    EmployeeCompetency[m
+[32m+[m[32m)[m
+[32m+[m[32mfrom schemas import AssessmentCreate, AssessmentResponse[m
+[32m+[m
+[32m+[m[32mrouter = APIRouter([m
+[32m+[m[32m    prefix="/assessments",[m
+[32m+[m[32m    tags=["Assessments"][m
+[32m+[m[32m)[m
+[32m+[m
+[32m+[m
+[32m+[m[32m@router.post("/", response_model=AssessmentResponse)[m
+[32m+[m[32mdef create_assessment([m
+[32m+[m[32m    assessment: AssessmentCreate,[m
+[32m+[m[32m    db: Session = Depends(get_db)[m
+[32m+[m[32m):[m
+[32m+[m
+[32m+[m[32m    # Check employee[m
+[32m+[m[32m    employee = db.query(Employee).filter([m
+[32m+[m[32m        Employee.id == assessment.employee_id[m
+[32m+[m[32m    ).first()[m
+[32m+[m
+[32m+[m[32m    if not employee:[m
+[32m+[m[32m        raise HTTPException([m
+[32m+[m[32m            status_code=404,[m
+[32m+[m[32m            detail="Employee not found"[m
+[32m+[m[32m        )[m
+[32m+[m
+[32m+[m[32m    # Check competency[m
+[32m+[m[32m    competency = db.query(Competency).filter([m
+[32m+[m[32m        Competency.id == assessment.competency_id[m
+[32m+[m[32m    ).first()[m
+[32m+[m
+[32m+[m[32m    if not competency:[m
+[32m+[m[32m        raise HTTPException([m
+[32m+[m[32m            status_code=404,[m
+[32m+[m[32m            detail="Competency not found"[m
+[32m+[m[32m        )[m
+[32m+[m
+[32m+[m[32m    # Validate assessment[m
+[32m+[m[32m    if assessment.total_questions <= 0:[m
+[32m+[m[32m        raise HTTPException([m
+[32m+[m[32m            status_code=400,[m
+[32m+[m[32m            detail="Total questions must be greater than 0"[m
+[32m+[m[32m        )[m
+[32m+[m
+[32m+[m[32m    if assessment.score < 0 or assessment.score > assessment.total_questions:[m
+[32m+[m[32m        raise HTTPException([m
+[32m+[m[32m            status_code=400,[m
+[32m+[m[32m            detail="Score must be between 0 and total questions"[m
+[32m+[m[32m        )[m
+[32m+[m
+[32m+[m[32m    # Calculate percentage[m
+[32m+[m[32m    percentage = ([m
+[32m+[m[32m        assessment.score / assessment.total_questions[m
+[32m+[m[32m    ) * 100[m
+[32m+[m
+[32m+[m[32m    # Store assessment[m
+[32m+[m[32m    new_assessment = Assessment([m
+[32m+[m[32m        employee_id=assessment.employee_id,[m
+[32m+[m[32m        competency_id=assessment.competency_id,[m
+[32m+[m[32m        score=assessment.score,[m
+[32m+[m[32m        total_questions=assess
